@@ -116,11 +116,9 @@ const About: React.FC = () => {
   const measureRefs = useRef<Record<string, HTMLSpanElement | null>>({});
   const [placed, setPlaced] = useState<Record<string, Pt>>({});
 
-  // ensure stable order but shuffle a bit so big words don't always center-clump
   const words = useMemo(() => {
     const copy = [...WORDS];
     copy.sort((a, b) => b.weight - a.weight);
-    // small deterministic shuffle among same weights
     for (let i = 0; i < copy.length; i++) {
       const j = i + ((i * 7) % (copy.length - i));
       [copy[i], copy[j]] = [copy[j], copy[i]];
@@ -140,32 +138,29 @@ const About: React.FC = () => {
     const rects: Rect[] = [];
     const placedNext: Record<string, Pt> = {};
 
-    // measure sizes of each word from hidden measuring nodes
+    // measure sizes
     const sizes = words.map((w) => {
       const node = measureRefs.current[w.text]!;
       const { width, height } = node.getBoundingClientRect();
-      // add a tiny padding to reduce near-touches
       return { text: w.text, w: width + 8, h: height + 4, weight: w.weight };
     });
 
-    // place words largest → smallest on a spiral
+    // place largest → smallest on a spiral
     for (let i = 0; i < sizes.length; i++) {
-      const { text, w, h, weight } = sizes[i];
+      // FIX #1: don’t destructure `weight` since we don’t use it
+      const { text, w, h } = sizes[i];
 
-      // spiral params
-      const a = 8; // initial radius
-      const b = 6; // radial growth per radian
+      const a = 8;
+      const b = 6;
       let theta = 0;
       let placedHere: Pt | null = null;
 
-      // try up to N steps along the spiral
       for (let tries = 0; tries < 3000; tries++) {
         const r = a + b * theta;
         const x = centerX + r * Math.cos(theta) - w / 2;
         const y = centerY + r * Math.sin(theta) - h / 2;
-        const rotate = ((i * 13) % 2 ? -1 : 1) * Math.min(5, (i % 5) + 1); // subtle tilt
+        const rotate = ((i * 13) % 2 ? -1 : 1) * Math.min(5, (i % 5) + 1);
 
-        // keep inside container bounds with a margin
         if (x < 8 || y < 8 || x + w > W - 8 || y + h > H - 8) {
           theta += 0.18;
           continue;
@@ -176,9 +171,9 @@ const About: React.FC = () => {
           placedHere = { left: x, top: y, rotate };
           break;
         }
-        theta += 0.18; // step along spiral
+        theta += 0.18;
       }
-      // fallback: line placement if spiral failed (rare on very small screens)
+
       if (!placedHere) {
         const y = 10 + i * (h + 6);
         const x = Math.max(8, Math.min(centerX - w / 2, W - w - 8));
@@ -200,7 +195,7 @@ const About: React.FC = () => {
         </h2>
         <p className="text-2xl text-neutral-600 mb-8">Get to know us from a few words:</p>
 
-        {/* Mobile fallback: simple wrapped text, no overlaps */}
+        {/* Mobile */}
         <div className="md:hidden leading-tight">
           {WORDS.map((w, i) => (
             <span
@@ -216,14 +211,17 @@ const About: React.FC = () => {
           ))}
         </div>
 
-        {/* Desktop non-overlapping cloud */}
+        {/* Desktop cloud */}
         <div ref={containerRef} className="hidden md:block relative w-full" style={{ height: CLOUD_HEIGHT }}>
           {/* hidden measurers */}
           <div className="absolute -top-[10000px] left-0">
             {WORDS.map((w) => (
               <span
                 key={`measure-${w.text}`}
-                ref={(n) => (measureRefs.current[w.text] = n)}
+                // FIX #2: return void in the ref callback
+                ref={(n) => {
+                  measureRefs.current[w.text] = n;
+                }}
                 className={`${sizeFor(w.weight)} ${weightFor(w.weight)}`}
                 style={{ fontFamily: "inherit" }}
               >
