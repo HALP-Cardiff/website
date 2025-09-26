@@ -330,12 +330,12 @@ const Projects: React.FC = () => (
 
 const Contact: React.FC = () => (
   <section id="contact" className="px-6 md:px-10 py-16">
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: BRAND.ink }}>
         Get in touch
       </h2>
     </div>
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <p className="text-neutral-600 mb-6">
         Drop us a line for collabs, ideas, or to show your project.
       </p>
