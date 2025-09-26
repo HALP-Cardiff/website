@@ -103,7 +103,7 @@ const Banner: React.FC = () => (
     </motion.p>
 
     <HaloDivider />
-    <div className="mt-2 flex text-2xl items-center gap-4 text-neutral-600 mb-6">
+    <div className="mt-2 flex text-2xl items-center gap-4 text-neutral-600">
       <span>2025</span>
       <span>•</span>
       <span>Side projects & experiments</span>
@@ -189,7 +189,7 @@ const About: React.FC = () => {
   return (
     <section id="about" className="px-6 md:px-10 py-16">
     <div className="mx-auto max-w-6xl border border-neutral-500 rounded-lg">
-    <div className="max-w-6xl mt-10 mx-5">
+    <div className="max-w-6xl mt-6 mb-6 mx-5">
         <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: BRAND.ink }}>
           About us
         </h2>
